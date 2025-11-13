@@ -1,0 +1,32 @@
+{
+  "name": "apium",
+  "version": "0.0.2",
+  "description": "An interactive CLI tool for exploring OpenAPI 3 specifications in the terminal.",
+  "keywords": [
+    "openapi",
+    "cli",
+    "terminal",
+    "api",
+    "explorer"
+  ],
+  "bin": {
+    "apium": "../bin/apium"
+  },
+  "scripts": {
+    "build": "op3api/node_modules/.bin/tsc",
+    "start": "op3api/node_modules/.bin/ts-node ../src/cli.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.0.0",
+    "js-yaml": "^4.1.0",
+    "openapi-types": "^11.0.0",
+    "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.4.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
