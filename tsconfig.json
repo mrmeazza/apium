@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "outDir": "op3api/dist",
+    "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
