@@ -10,14 +10,14 @@
     "explorer"
   ],
   "bin": {
-    "apium": "../bin/apium"
+    "apium": "./bin/apium.sh"
   },
   "scripts": {
-    "build": "op3api/node_modules/.bin/tsc",
-    "start": "op3api/node_modules/.bin/ts-node ../src/cli.ts"
+    "build": "tsc",
+    "start": "ts-node src/cli.ts"
   },
   "dependencies": {
-    "chalk": "^5.3.0",
+    "chalk": "^4.1.2",
     "commander": "^11.0.0",
     "js-yaml": "^4.1.0",
     "openapi-types": "^11.0.0",

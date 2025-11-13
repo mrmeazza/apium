@@ -1,5 +1,4 @@
 import {OpenAPIV3} from "openapi-types";
-import HttpMethods = OpenAPIV3.HttpMethods;
 
 export interface ParameterSchema {
     type?: string;
