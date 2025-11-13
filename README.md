@@ -15,11 +15,19 @@
 - **Minimal and fast:** Runs entirely in your terminal without a web interface.
 
 ---
+## Screenshot
+
+### Overview
+![Overview](docs/images/1.png)
+
+### Endpoint Details
+![Details](docs/images/2.png)
+
 
 ## Installation
 
 ```bash
-npm install -g apium-cli
+npm install -g @mrmeazza/apium-cli
 ```
 
 ## Usage
