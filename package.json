@@ -1,5 +1,5 @@
 {
-  "name": "apium",
+  "name": "apium-cli",
   "version": "0.0.3",
   "description": "An interactive CLI tool for exploring OpenAPI 3 specifications in the terminal.",
   "keywords": [
@@ -10,7 +10,7 @@
     "explorer"
   ],
   "bin": {
-    "apium": "./bin/apium.sh"
+    "apium": "./bin/apium"
   },
   "scripts": {
     "build": "tsc",
