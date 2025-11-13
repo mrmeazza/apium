@@ -1,8 +1,14 @@
 {
   "name": "apium",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An interactive CLI tool for exploring OpenAPI 3 specifications in the terminal.",
-  "keywords": ["openapi", "cli", "terminal", "api", "explorer"],
+  "keywords": [
+    "openapi",
+    "cli",
+    "terminal",
+    "api",
+    "explorer"
+  ],
   "bin": {
     "apium": "../bin/apium"
   },
