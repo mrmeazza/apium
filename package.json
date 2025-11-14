@@ -10,7 +10,7 @@
     "explorer"
   ],
   "bin": {
-    "apium": "./bin/apium"
+    "apium": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
