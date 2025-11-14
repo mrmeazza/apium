@@ -18,10 +18,10 @@
 ## Screenshot
 
 ### Overview
-![Overview](docs/images/1.png)
+![Overview](https://raw.githubusercontent.com/mrmeazza/apium/refs/heads/main/docs/images/1.png)
 
 ### Endpoint Details
-![Details](docs/images/2.png)
+![Details](https://raw.githubusercontent.com/mrmeazza/apium/refs/heads/main/docs/images/2.png)
 
 
 ## Installation
