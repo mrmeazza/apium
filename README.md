@@ -27,7 +27,7 @@
 ## Installation
 
 ```bash
-npm install -g @mrmeazza/apium-cli
+npm install -g apium-cli
 ```
 
 ## Usage
