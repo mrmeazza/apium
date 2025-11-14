@@ -1,6 +1,6 @@
 {
   "name": "apium-cli",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "An interactive CLI tool for exploring OpenAPI 3 specifications in the terminal.",
   "keywords": [
     "openapi",
