@@ -5,42 +5,13 @@ import tty from 'node:tty';
 import chalk from 'chalk';
 import yaml from 'js-yaml';
 import fs from 'node:fs';
-import {Endpoint, Schema} from "./models";
+import {Endpoint, OverviewModeType, Schema} from "./types";
 import { OpenAPIV3 } from "openapi-types";
 
 import {version, name} from '../package.json'
-import HttpMethods = OpenAPIV3.HttpMethods;
+import {parseEndpoints, parseSchemas,colorMethod} from "./utils";
 
 const VERSION = `${name} ${version}`;
-
-const ALLOWED_METHODS:HttpMethods[] =Object.values(HttpMethods).filter(value =>['get', 'post', 'put', 'patch','delete','head'].includes(value))
-
-function colorMethod(method: string): string {
-    switch (method.toUpperCase()) {
-        case 'GET':
-            return chalk.green.bold(method);
-        case 'POST':
-            return chalk.blue.bold(method);
-        case 'PUT':
-            return chalk.yellow.bold(method);
-        case 'DELETE':
-            return chalk.red.bold(method);
-        case 'PATCH':
-            return chalk.magenta.bold(method);
-        default:
-            return method;
-    }
-}
-
-
-interface OperationObject {
-    summary?: string;
-    description?: string;
-    parameters?: Array<any>;
-    responses?: Record<string, any>;
-    tags?: string[];
-}
-
 
 class ApiumShell {
     openapi: OpenAPIV3.Document
@@ -50,12 +21,12 @@ class ApiumShell {
     currentMethodIndex: number;
     selectedEndpointIndex: number;
     keyInput: any
-    mode: 'list' | 'details' = 'list';
+    mode: OverviewModeType = 'list';
 
     constructor(openapi: OpenAPIV3.Document) {
         this.openapi = openapi;
-        this.endpoints = this.parseEndpoints(openapi);
-        this.schemas = this.parseSchemas(openapi);
+        this.endpoints = parseEndpoints(openapi);
+        this.schemas = parseSchemas(openapi);
         const allMethods = new Set<string>();
         this.endpoints.forEach(e => {
             allMethods.add(e.method.toUpperCase());
@@ -75,57 +46,6 @@ class ApiumShell {
         this.keyInput.on('keypress', (_: any, key: readline.Key) => this.handleKey(key));
     }
 
-    parseEndpoints(openapi: OpenAPIV3.Document): Endpoint[] {
-        const eps: Endpoint[] = [];
-        for (const [path,methods] of Object.entries(openapi.paths)) {
-            // @ts-ignore
-            for (const [method, info] of Object.entries(methods)) {
-                const op = info as OperationObject;
-                const params = (op.parameters || []).map(p => ({
-                    name: p.name,
-                    in_: p.in,
-                    required: p.required,
-                    description: p.description,
-                    schema: p.schema
-                }));
-                const responses = Object.entries(op.responses || {}).map(([code, r]) => {
-                    let responseRef
-                    let description = r.description;
-                    if ( r.$ref) {
-                        const refName = r.$ref.replace('#/components/responses/', '');
-                        description = (openapi.components?.responses as any)?.[refName]?.description || r.description;
-                    }
-
-
-
-                    return {
-                        code,
-                        description,
-                        schema: r.content?.['application/json']?.schema || {}
-                    };
-                });
-                eps.push(new Endpoint({
-                    method:method.toUpperCase(),
-                    path,
-                    summary: op.summary || '',
-                    description: op.description || '',
-                    // @ts-ignore
-                    parameters: params,
-                    // @ts-ignore
-                    responses,
-                    // @ts-ignore
-                    tags: op.tags && op.tags.length > 0 ? op.tags : ['Untagged']
-                }));
-            }
-        }
-        return eps;
-    }
-
-    parseSchemas(openapi: OpenAPIV3.Document): Schema[] {
-        const schemas = openapi.components?.schemas || {};
-        return Object.entries(schemas).map(([name, schema]) => new Schema({name, schema}));
-    }
-
     render() {
         console.clear();
         this.renderHeader();
@@ -139,7 +59,19 @@ class ApiumShell {
         this.renderFooter();
     }
 
+    renderLine(){
+        const width = process.stdout.columns || 50;
+        if (width <= 2) {
+            console.log('─');
+            return;
+        }
+        console.log('+' + '-'.repeat(width - 2) + '+');
+    }
+
+
+
     renderHeader() {
+        this.renderLine()
         const title = this.openapi.info?.title || 'OpenAPI';
         const version = this.openapi.info?.version || '';
         const headerText = `${title} ${version}`.trim();
@@ -151,13 +83,13 @@ class ApiumShell {
     renderTabs() {
         const tabs = this.methods.map((m, i) => {
             if (i === this.currentMethodIndex) {
-                return `[${chalk.bgBlue.white.bold(m)}]`;
+                return `[${colorMethod(m)}]`;
             } else {
                 return chalk.bold(` ${m} `);
             }
         }).join(' ');
         console.log(tabs);
-        console.log('-'.repeat(process.stdout.columns || 50));
+        this.renderLine()
     }
 
     renderEndpoints() {
@@ -176,16 +108,9 @@ class ApiumShell {
     }
 
     renderFooter() {
-        console.log(chalk.bgBlackBright.bold('\n ← → to switch methods • ↑ ↓ to navigate • Enter for details • q to quit '))
-        this.renderVersion();
-    }
-
-    renderVersion() {
         const termWidth = process.stdout.columns || 80;
-        const termHeight = process.stdout.rows - 1 || 24;
-        const padding = Math.max(0, termWidth - VERSION.length - 1);
-        process.stdout.write(`\x1b[${termHeight};1H`);
-        console.log(' '.repeat(padding) + chalk.dim(VERSION));
+        const footerText = ' ← → to switch methods • ↑ ↓ to navigate • Enter for details • q to quit '
+        console.log(chalk.white.bold(footerText.toUpperCase()))
     }
 
     handleKey(key: readline.Key) {
@@ -220,6 +145,8 @@ class ApiumShell {
     showEndpointDetails(endpoint: Endpoint) {
         console.clear();
         this.renderHeader()
+        console.log()
+        this.renderLine()
         console.log(`${colorMethod(endpoint.method)} ${endpoint.path}`);
         console.log(chalk.bold('Description:'), endpoint.description || endpoint.summary);
         if (endpoint.tags && endpoint.tags.length > 0) {
@@ -282,13 +209,13 @@ class ApiumShell {
             console.log(`  ${code}: ${r.description}`);
         });
 
-        console.log(chalk.bgBlackBright.bold('\n Press any key to return... '))
+        this.renderLine()
+        console.log(chalk.white.bold(' Press any key to return... '.toUpperCase()))
         const backToList = (_: string, key: readline.Key) => {
             this.keyInput.removeListener('keypress', backToList);
             this.mode = 'list';
             this.render();
         };
-        this.renderVersion()
         this.mode = 'details';
         this.keyInput.on('keypress', backToList);
     }
