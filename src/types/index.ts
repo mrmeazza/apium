@@ -1,4 +1,13 @@
-import {OpenAPIV3} from "openapi-types";
+export interface OperationObject {
+    summary?: string;
+    description?: string;
+    parameters?: Array<any>;
+    responses?: Record<string, any>;
+    tags?: string[];
+}
+
+export type OverviewModeType = 'list' | 'details'
+
 
 export interface ParameterSchema {
     type?: string;
