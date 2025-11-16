@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: Conference Events API
+  description: API to manage event registrations for conferences
+  version: 1.0.0
+paths:
+  /register-session:
+    post:
+      tags:
+        - Registration
+      summary: Register for a conference session
+      description: Register a user for a specific session based on their role, with details provided for each registration type.
+      operationId: registerSession
+      requestBody:
+        description: Registers a user for a session at the conference. It accepts different formats for attendance, speaker, or VIP registrations.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionRegistration'
+            examples:
+              Attendee:
+                summary: Register as an Attendee
+                value:
+                  userType: Attendee
+                  userId: 789
+                  sessionId: 1234
+                  preferences:
+                    seating: General
+                    accessLevel: Basic
+              Speaker:
+                summary: Register as a Speaker
+                value:
+                  userType: Speaker
+                  userId: 456
+                  sessionId: 1234
+                  preferences:
+                    seating: VIP
+                    accessLevel: Full
+                    presentationEquipment: Projector
+              VIP:
+                summary: Register as VIP
+                value:
+                  userType: VIP
+                  userId: 123
+                  sessionId: 1234
+                  preferences:
+                    seating: Front Row
+                    accessLevel: Full
+                    exclusiveAccess: true
+      responses:
+        '200':
+          description: Successful registration for Attendee, Speaker, or VIP
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  registrationId:
+                    type: string
+                  success:
+                    type: boolean
+              examples:
+                Attendee:
+                  summary: Response for Attendee registration
+                  value:
+                    registrationId: att-456def
+                    success: true
+                Speaker:
+                  summary: Response for Speaker registration
+                  value:
+                    registrationId: spk-123abc
+                    success: true
+                VIP:
+                  summary: Response for VIP registration
+                  value:
+                    registrationId: vip-789ghi
+                    success: true
+components:
+  schemas:
+    SessionRegistration:
+      type: object
+      properties:
+        userType:
+          type: string
+          description: Type of user registering (e.g., Attendee, Speaker, VIP)
+        userId:
+          type: integer
+          description: Unique ID of the user
+        sessionId:
+          type: integer
+          description: Unique ID of the session to register for
+        preferences:
+          type: object
+          properties:
+            seating:
+              type: string
+              description: Seating preference (e.g., General, VIP, Front Row)
+            accessLevel:
+              type: string
+              description: Access level granted (e.g., Basic, Full)
+            presentationEquipment:
+              type: string
+              description: Required equipment for Speakers (only applicable to Speaker)
+            exclusiveAccess:
+              type: boolean
+              description: Exclusive access for VIP users
