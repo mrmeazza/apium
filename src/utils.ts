@@ -24,7 +24,12 @@ export function parseEndpoints(openapi: OpenAPIV3.Document): Endpoint[] {
         // @ts-ignore
         for (const [method, info] of Object.entries(methods)) {
             const op = info as any;
-            const params = (op.parameters || []).map((p: any) => ({
+            const pathParams = (methods as any).parameters || [];
+
+            const methodParams = op.parameters || [];
+            const rawParams = [...pathParams, ...methodParams];
+
+            const params = rawParams.map((p: any) => ({
                 name: p.name,
                 in_: p.in,
                 required: p.required,
